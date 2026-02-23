@@ -1,0 +1,9 @@
+CustomerID,Name,Age,Region,SignupDate,OrderID,Product,Quantity,Price,OrderDate,Revenue,TicketID,IssueType,ResolutionTime,CLV
+C001,Amit,28.0,North,2023-01-15,O1001,Laptop,2,49500.0,2023-04-10,99000.0,T001,Delivery Delay,48,99000.0
+C002,Priya,35.0,South,2022-11-20,O1002,Mobile,1,22500.0,2023-04-12,22500.0,T002,Payment Issue,24,22500.0
+C003,John,33.0,East,2023-03-05,O1003,Tablet,3,13500.0,2023-05-01,40500.0,T003,Product Defect,72,40500.0
+C004,Sara,42.0,West,2021-07-12,O1004,Laptop,1,54000.0,2023-05-15,54000.0,T004,Delivery Delay,36,54000.0
+C005,David,30.0,North,2023-02-10,O1005,Mobile,2,19800.0,2023-06-05,39600.0,T005,Payment Issue,12,39600.0
+C006,Meera,27.0,South,2022-09-18,O1006,Headphones,5,1800.0,2023-06-10,9000.0,T006,Product Defect,60,9000.0
+C007,Alex,33.0,East,2023-01-25,O1007,Laptop,1,52200.0,2023-07-02,52200.0,T007,Delivery Delay,30,52200.0
+C008,Ravi,40.0,West,2022-12-01,O1008,Tablet,2,16200.0,2023-07-20,32400.0,T008,Payment Issue,20,32400.0
