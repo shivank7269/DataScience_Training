@@ -1,0 +1,13 @@
+ID,Domain,Department/Product/Subscription,Age/Sales/WatchTime,Salary/Revenue/Charges,Region,MissingField
+1,Healthcare,Cardiology,45,60000,North,NA
+2,Healthcare,Emergency,32,55000,East,NA
+3,Healthcare,Pediatrics,29,48000,West,NA
+4,Healthcare,Emergency,40,52000,South,NA
+5,Retail,Electronics,NA,120000,North,DiscountCode
+6,Retail,Fashion,NA,95000,East,NA
+7,Retail,Groceries,NA,150000,West,NA
+8,Retail,Electronics,NA,130000,South,NA
+9,Streaming,Basic,2.5,199,Global,NA
+10,Streaming,Premium,4.8,499,Global,NA
+11,Streaming,Standard,3.2,299,Global,NA
+12,Streaming,Premium,5.1,499,Global,NA
