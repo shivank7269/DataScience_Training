@@ -30,3 +30,4 @@ transformers
 
 spacy
 sentence-transformers
+faiss-cpu
