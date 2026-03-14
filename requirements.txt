@@ -31,3 +31,5 @@ transformers
 spacy
 sentence-transformers
 faiss-cpu
+chromadb
+tensorflow
