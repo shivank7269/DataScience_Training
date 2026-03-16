@@ -33,3 +33,4 @@ sentence-transformers
 faiss-cpu
 chromadb
 tensorflow
+pypdf

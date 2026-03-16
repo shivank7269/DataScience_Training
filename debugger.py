@@ -1,78 +1,129 @@
-import zipfile
-import os
-import shutil
-from pathlib import Path
-import random
+from pypdf import PdfReader
+from sentence_transformers import SentenceTransformer
+import chromadb
 
-# Step 1: Already done ✅
-print("🔄 Step 1: Using existing extraction...")
+from transformers import pipeline
 
-# Step 2: Create target structure
-base_dir = Path("weekly_practicle_project_14march]/dataset")  # New clean folder
-for split in ['train', 'validation']:
-    for category in ['recyclable', 'organic', 'non_recyclable']:
-        (base_dir / split / category).mkdir(parents=True, exist_ok=True)
+print("Loading pdf...")
+reader = PdfReader("Dataset/Introduction_to_Data_Science.pdf")
 
-# Step 3: UNIVERSAL folder detection + mapping
-print("\n🔍 Step 3: Auto-detecting folders...")
-extract_dir = "dataset"  # Your extracted path
+text = ""
 
-all_images = {'recyclable': [], 'organic': [], 'non_recyclable': []}
+for page in reader.pages:
+    text += page.extract_text()
 
-# Walk through ALL subfolders and classify
-for root, dirs, files in os.walk(extract_dir):
-    folder_name = Path(root).name.lower()
+print("Document Loaded")
 
-    # Smart classification based on folder names
-    if any(word in folder_name for word in ['cardboard', 'glass', 'metal', 'plastic']):
-        category = 'recyclable'
-    elif any(word in folder_name for word in ['trash', 'misc', 'battery', 'textile']):
-        category = 'non_recyclable'
-    elif any(word in folder_name for word in ['paper']):
-        category = 'organic'
-    else:
-        continue  # Skip unknown folders
+# Splitting document
 
-    # Collect images
-    for file in files:
-        if file.lower().endswith(('.png', '.jpg', '.jpeg')):
-            all_images[category].append(os.path.join(root, file))
+print("Splitting document into chunks")
 
-print("📊 Found images:")
-for cat, imgs in all_images.items():
-    print(f"  {cat}: {len(imgs)} images")
+def chunk_text(text):
+    chunk_size = 200
+    overlap = 50
 
-# Step 4: 80/20 split
-print("\n🔄 Step 4: 80/20 split...")
-for category, images in all_images.items():
-    if images:
-        random.shuffle(images)
-        train_end = int(0.8 * len(images))
+    chunks=[]
+    start = 0
 
-        # Train split
-        for src in images[:train_end]:
-            filename = Path(src).name
-            dst = base_dir / 'train' / category / filename
-            if not dst.exists():
-                shutil.copy2(src, dst)
+    while start < len(text):
+        end = start+chunk_size
+        chunk = text[start:end]
 
-        # Validation split
-        for src in images[train_end:]:
-            filename = Path(src).name
-            dst = base_dir / 'validation' / category / filename
-            if not dst.exists():
-                shutil.copy2(src, dst)
+        chunks.append(chunk)
 
-# Step 5: Final count (TASK 1)
-print("\n" + "=" * 60)
-print("📈 TASK 1 DELIVERABLE - FINAL STRUCTURE")
-print("=" * 60)
-for split in ['train', 'validation']:
-    print(f"\n{split.upper()}:")
-    total = 0
-    for cat in ['recyclable', 'organic', 'non_recyclable']:
-        path = base_dir / split / cat
-        count = len([f for f in path.iterdir() if f.suffix.lower() in ['.jpg', '.png']])
-        print(f"  {cat}: {count:3d} images")
-        total += count
-    print(f"  Total: {total:3d} images")
+        start += chunk_size - overlap
+    return chunks
+
+chunks = chunk_text(text)
+print("Total Chunks Created :",len(chunks))
+
+# Embed Data
+
+print("Loading Embedding Model ...")
+embedding_model = SentenceTransformer(
+    "sentence-transformers/all-MiniLM-L6-v2"
+)
+
+print("Embedding Model Loaded")
+
+# create vector db
+
+client = chromadb.Client()
+collection = client.create_collection("pdf_collection")
+
+# store chunks in vector
+for i,chunk in enumerate(chunks):
+    embedding = embedding_model.encode(chunk).tolist()
+    collection.add(
+        documents = [chunk],
+        embeddings = [embedding],
+        ids = [str(i)]
+    )
+
+print("All chunks stored successfully")
+
+# retrieve the data
+
+def retrieve(query,k=3):
+    query_embedding = embedding_model.encode(query).tolist()
+
+    result = collection.query(
+        query_embeddings = [query_embedding],
+        n_results=k
+    )
+    return result["documents"][0]
+
+# load the llm
+print("Loading llm")
+qa_pipeline = pipeline(
+    "text-generation",
+    model="TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+)
+print("LLM LOADED SUCCESSFULLY")
+
+# answer question
+
+def answer_question(query):
+    context_docs = retrieve(query)
+    context = " ".join(context_docs)
+
+    prompt = f"""
+You are an AI assistant.
+Answer using ONLY the context below.
+
+Context:
+{context}
+
+Question:
+{query}
+
+If the answer is not present say "Not found in document".
+
+Answer:
+"""
+
+    response = qa_pipeline(
+        prompt,
+        max_new_tokens=120,
+        temperature=0.5,
+        do_sample=True
+    )
+
+    return response[0]["generated_text"].replace(prompt, "").strip()
+
+# QUestion ANSWER
+print("\n==============================")
+print("RAG Chatbot Ready")
+print("Type 'exit' to stop")
+print("==============================\n")
+
+while True:
+
+    question = input("Ask a question | type 'exit' to quit: ")
+    if question.lower() == "exit":
+        print("Goodbye!")
+        break
+
+    answer = answer_question(question)
+
+    print("\nAnswer:\n", answer)
