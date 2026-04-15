@@ -1,0 +1,34 @@
+[
+    {
+        "file_name": "test1.jpeg",
+        "student_name": "Manu",
+        "student_id": "245860",
+        "course": null,
+        "date": null,
+        "fee_amount": null
+    },
+    {
+        "file_name": "test2.jpeg",
+        "student_name": "Matu",
+        "student_id": null,
+        "course": null,
+        "date": null,
+        "fee_amount": null
+    },
+    {
+        "file_name": "test3.jpeg",
+        "student_name": "Manu",
+        "student_id": null,
+        "course": null,
+        "date": null,
+        "fee_amount": null
+    },
+    {
+        "file_name": "test4.jpeg",
+        "student_name": "Manu",
+        "student_id": "245860",
+        "course": null,
+        "date": null,
+        "fee_amount": null
+    }
+]

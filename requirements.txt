@@ -34,3 +34,8 @@ faiss-cpu
 chromadb
 tensorflow
 pypdf
+
+
+# Azure docutment intelligence
+azure-ai-formrecognizer
+azure-storage-blob
